@@ -20,29 +20,153 @@
 <meta name="description" content="Babysitting and mother's helper in Cambridge, MA by Iona. Red Cross Babysitter's Training with Pediatric First Aid, CPR and AED." />
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231f4d4a'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23f6f2e9' text-anchor='middle'%3EI%3C/text%3E%3C/svg%3E" />
 <style>
+:root { --gutter: 24px; }
+
 .h1:hover { background: #1f4d4a; }
 .h2:hover { border-color: #6b4f96; }
 .h3:hover { background: #cbbae0; }
 img { max-width: 100%; }
-@media (max-width: 860px) {
-  section { grid-template-columns: 1fr !important; }
+
+/* ─── Navigation: inline down to 830px (measured: where the brand and the
+   seven links stop fitting on one line), disclosure panel below ─────────
+   A closed <details> gets `content-visibility: hidden` on ::details-content,
+   which implies `contain: paint` and so makes it the containing block for
+   absolutely-positioned descendants — that would trap the panel inside the
+   44px toggle. Forcing the pseudo visible removes the containment; we then
+   show and hide the panel ourselves off the [open] attribute. */
+.nav-shell::details-content { content-visibility: visible !important; }
+.nav-toggle { display: none; }
+.nav-shell > nav a { display: block; }
+
+@media (min-width: 830px) {
+  .nav-shell > nav { display: flex !important; }
+}
+
+@media (max-width: 829px) {
+  .site-header { position: relative; align-items: center !important; gap: 16px !important; }
+  .nav-toggle {
+    display: block; width: 44px; height: 40px; line-height: 38px; text-align: center;
+    font-size: 18px; color: #1f4d4a; background: #fbf8f4;
+    border: 1px solid #ded2ea; border-radius: 3px;
+  }
+  .nav-shell[open] .nav-toggle { background: #ece4f3; border-color: #c3b2dc; }
+  .nav-shell:not([open]) > nav { display: none !important; }
+  .nav-shell[open] > nav {
+    display: flex !important;
+    position: absolute; top: calc(100% + 12px); left: 0; right: 0;
+    flex-direction: column; flex-wrap: nowrap !important; gap: 2px !important;
+    background: #fbf8f4; border: 1px solid #ded2ea; border-radius: 3px;
+    padding: 8px; z-index: 30; box-shadow: 0 16px 34px rgba(47, 58, 58, 0.13);
+  }
+  .nav-shell[open] > nav a { padding: 13px 12px; border-radius: 2px; }
+  .nav-shell[open] > nav a:hover { background: #f0eaf7; }
+}
+
+/* ─── Grid tracks never demand more width than they have ──────────────────
+   `minmax(280px, 1fr)` overflows a narrower parent, and an `auto` minimum
+   lets a date input's intrinsic width push its whole column out. */
+.cols { grid-template-columns: repeat(auto-fit, minmax(min(var(--col), 100%), 1fr)) !important; }
+.cols > * { min-width: 0; }
+.pair { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+#contact form input, #contact form select, #contact form textarea {
+  width: 100%; min-width: 0;
+}
+
+/* ─── Two-column sections collapse ────────────────────────────────────── */
+@media (max-width: 900px) {
+  #top, #about, #evening { grid-template-columns: 1fr !important; gap: 40px !important; }
+  .hero-figure { max-width: 360px; margin-inline: auto !important; }
+}
+
+/* ─── Vertical rhythm tightens on small screens ───────────────────────── */
+@media (max-width: 760px) {
+  #top { padding: 44px 0 56px !important; }
+  #about, #care, #when, #references, #faq { padding-bottom: 64px !important; }
+  #evening { padding-bottom: 64px !important; }
+  .certs { margin: 40px 0 64px !important; }
+  #rates { margin-bottom: 64px !important; }
+  #contact { margin-bottom: 60px !important; }
+  .contact-grid { gap: 38px !important; }
+  .site-footer { padding-bottom: 44px !important; }
+}
+
+/* ─── Availability chart: bars go full width, then times become text ──── */
+@media (max-width: 620px) {
+  .day-row, .axis-row { grid-template-columns: 1fr !important; gap: 7px !important; }
+  .axis-row > span:first-child { display: none; }
+  .bar-text { font-size: 12.5px; }
+  .bar-fill { padding-left: 9px !important; }
+}
+@media (max-width: 480px) {
+  .day-name { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .day-name::after {
+    content: attr(data-time);
+    font-size: 13px; font-weight: 400; color: #5c6666; letter-spacing: 0.02em;
+  }
+  .bar-text { display: none; }
+  .bar-empty { padding-left: 0 !important; }
+  .axis-ticks { font-size: 10.5px !important; letter-spacing: 0.04em !important; }
+}
+
+/* ─── Rates: table becomes one card per row ───────────────────────────── */
+@media (max-width: 560px) {
+  .rates-wrap { overflow-x: visible; }
+  .rates-table { display: block; min-width: 0 !important; }
+  .rates-table thead { display: none; }
+  .rates-table tbody { display: block; }
+  .rates-table tr {
+    display: block; background: #fff; border: 1px solid #ded2ea;
+    border-radius: 3px; padding: 2px 16px 6px; margin-bottom: 14px;
+  }
+  .rates-table td { display: block; border: 0 !important; }
+  .rates-table td[data-row] {
+    padding: 13px 0 11px !important;
+    font-size: 11.5px !important; letter-spacing: 0.18em; text-transform: uppercase;
+    color: #6b4f96 !important; border-bottom: 1px solid #ece4f3 !important;
+  }
+  .rates-table td[data-label] {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 16px; padding: 11px 0 !important;
+  }
+  .rates-table td[data-label] + td[data-label] { border-top: 1px solid #f4eef8 !important; }
+  .rates-table td[data-label]::before {
+    content: attr(data-label);
+    font-family: Karla, system-ui, sans-serif; font-size: 15px; color: #5c6666;
+  }
+}
+
+/* ─── Cards and form fields at phone widths ───────────────────────────── */
+@media (max-width: 560px) {
+  :root { --gutter: 20px; }
+  #care article { padding: 30px 24px !important; }
+  #references blockquote { padding: 26px 22px !important; }
+  .certs > div { padding: 26px 22px !important; }
+}
+@media (max-width: 440px) {
+  .pair { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 380px) {
+  :root { --gutter: 16px; }
 }
 </style>
 </head>
 <body>
-<div style="max-width: 1180px; margin: 0 auto; padding: 0 24px 0">
+<div class="wrap" style="max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter)">
 
-  <header style="display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: baseline; justify-content: space-between; padding: 26px 0 22px; border-bottom: 1px solid #ded2ea">
+  <header class="site-header" style="display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: baseline; justify-content: space-between; padding: 26px 0 22px; border-bottom: 1px solid #ded2ea">
     <a href="#top" style="font-family: Marcellus, Georgia, serif; font-size: 24px; letter-spacing: 0.06em; color: #1f4d4a; text-decoration: none">Iona&nbsp;Sits</a>
-    <nav style="display: flex; flex-wrap: wrap; gap: 8px 26px; font-size: 13.5px; letter-spacing: 0.09em; text-transform: uppercase">
+    <details class="nav-shell">
+      <summary class="nav-toggle" aria-label="Menu"><span aria-hidden="true">☰</span></summary>
+      <nav style="display: flex; flex-wrap: wrap; gap: 8px 26px; font-size: 13.5px; letter-spacing: 0.09em; text-transform: uppercase">
       <a href="#about" style="text-decoration: none">About</a>
       <a href="#care" style="text-decoration: none">Two ways I help</a>
       <a href="#evening" style="text-decoration: none">A visit</a>
       <a href="#rates" style="text-decoration: none">Rates</a>
       <a href="#when" style="text-decoration: none">Availability</a>
       <a href="#faq" style="text-decoration: none">FAQ</a>
-      <a href="#contact" style="text-decoration: none; color: #6b4f96; font-weight: 600">Get in touch</a>
-    </nav>
+        <a href="#contact" style="text-decoration: none; color: #6b4f96; font-weight: 600">Get in touch</a>
+      </nav>
+    </details>
   </header>
 
   <section id="top" style="display: grid; grid-template-columns: minmax(320px, 1fr) minmax(260px, 0.72fr); gap: 56px; align-items: center; padding: 72px 0 84px">
@@ -55,7 +179,7 @@ img { max-width: 100%; }
         <a href="#rates" style="display: inline-block; padding: 14px 30px; border: 1px solid #c3b2dc; color: #6b4f96; border-radius: 2px; font-size: 14.5px; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none" class="h2">See rates</a>
       </div>
     </div>
-    <figure style="margin: 0">
+    <figure class="hero-figure" style="margin: 0">
       <div style="border-radius: 220px 220px 6px 6px; overflow: hidden; border: 1px solid #ded2ea; background: #e8e0f0; aspect-ratio: 3 / 4">
         <img src="img/sunflowers.jpg" alt="Iona standing on a woodland path holding sunflowers" style="width: 100%; height: 100%; object-fit: cover; display: block" />
       </div>
@@ -68,7 +192,7 @@ img { max-width: 100%; }
     <span style="flex: 1; height: 1px; background: #ded2ea"></span>
   </div>
 
-  <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: #ded2ea; border: 1px solid #ded2ea; margin: 56px 0 96px">
+  <section class="certs cols" style="--col: 300px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: #ded2ea; border: 1px solid #ded2ea; margin: 56px 0 96px">
     <div style="background: #fbf8f4; padding: 30px 26px">
       <p style="margin: 0 0 10px; font-size: 11.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #6b4f96">Certified</p>
       <p style="margin: 0; font-family: Marcellus, Georgia, serif; font-size: 19px; line-height: 1.4; color: #1f4d4a">Red Cross Babysitter's Training</p>
@@ -110,7 +234,7 @@ img { max-width: 100%; }
   <section id="care" style="padding-bottom: 100px">
     <h2 style="margin: 0 0 12px; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: clamp(30px, 3.6vw, 42px); line-height: 1.18; color: #1f4d4a">Two ways I can help</h2>
     <p style="margin: 0 0 44px; max-width: 44em; font-size: 17.5px; line-height: 1.7; color: #5c6666">Which one fits depends on your kids' ages and how they do with someone new. If you're not sure, ask me and we'll figure it out together.</p>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px">
+    <div class="cols" style="--col: 300px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px">
       <article style="background: #fbf8f4; border: 1px solid #ded2ea; border-top: 3px solid #2c6e6a; border-radius: 3px; padding: 38px 34px">
         <p style="margin: 0 0 14px; font-size: 11.5px; letter-spacing: 0.2em; text-transform: uppercase; color: #2c6e6a">Independent sitting</p>
         <h3 style="margin: 0 0 18px; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: 27px; line-height: 1.25; color: #1f4d4a">On my own, with older kids</h3>
@@ -171,8 +295,8 @@ img { max-width: 100%; }
   <section id="rates" style="background: #fbf8f4; border: 1px solid #ded2ea; border-radius: 3px; padding: clamp(32px, 5vw, 60px); margin-bottom: 100px">
     <h2 style="margin: 0 0 10px; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: clamp(30px, 3.6vw, 42px); line-height: 1.18; color: #1f4d4a">Rates</h2>
     <p style="margin: 0 0 38px; font-size: 17.5px; line-height: 1.7; color: #5c6666">Per hour, in dollars, by the age of the youngest child.</p>
-    <div style="overflow-x: auto">
-      <table style="width: 100%; min-width: 460px; border-collapse: collapse; text-align: left">
+    <div class="rates-wrap" style="overflow-x: auto">
+      <table class="rates-table" style="width: 100%; min-width: 460px; border-collapse: collapse; text-align: left">
         <thead>
           <tr>
             <th style="padding: 0 16px 14px 0; font-size: 11.5px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #6b4f96; border-bottom: 1px solid #c3b2dc">Number of kids</th>
@@ -183,22 +307,22 @@ img { max-width: 100%; }
         </thead>
         <tbody>
           <tr>
-            <td style="padding: 20px 16px 20px 0; border-bottom: 1px solid #ece4f3; font-size: 17px; color: #414d4d">1 child</td>
-            <td style="padding: 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$18</td>
-            <td style="padding: 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$18</td>
-            <td style="padding: 20px 0 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$15</td>
+            <td data-row="1 child" style="padding: 20px 16px 20px 0; border-bottom: 1px solid #ece4f3; font-size: 17px; color: #414d4d">1 child</td>
+            <td data-label="Ages 0–2 *" style="padding: 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$18</td>
+            <td data-label="Ages 3–5" style="padding: 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$18</td>
+            <td data-label="Ages 5–10" style="padding: 20px 0 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$15</td>
           </tr>
           <tr>
-            <td style="padding: 20px 16px 20px 0; border-bottom: 1px solid #ece4f3; font-size: 17px; color: #414d4d">2 children</td>
-            <td style="padding: 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$21</td>
-            <td style="padding: 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$21</td>
-            <td style="padding: 20px 0 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$18</td>
+            <td data-row="2 children" style="padding: 20px 16px 20px 0; border-bottom: 1px solid #ece4f3; font-size: 17px; color: #414d4d">2 children</td>
+            <td data-label="Ages 0–2 *" style="padding: 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$21</td>
+            <td data-label="Ages 3–5" style="padding: 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$21</td>
+            <td data-label="Ages 5–10" style="padding: 20px 0 20px 16px; border-bottom: 1px solid #ece4f3; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$18</td>
           </tr>
           <tr>
-            <td style="padding: 20px 16px 20px 0; font-size: 17px; color: #414d4d">3 children</td>
-            <td style="padding: 20px 16px; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$24</td>
-            <td style="padding: 20px 16px; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$24</td>
-            <td style="padding: 20px 0 20px 16px; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$21</td>
+            <td data-row="3 children" style="padding: 20px 16px 20px 0; font-size: 17px; color: #414d4d">3 children</td>
+            <td data-label="Ages 0–2 *" style="padding: 20px 16px; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$24</td>
+            <td data-label="Ages 3–5" style="padding: 20px 16px; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$24</td>
+            <td data-label="Ages 5–10" style="padding: 20px 0 20px 16px; font-family: Marcellus, Georgia, serif; font-size: 25px; color: #1f4d4a">$21</td>
           </tr>
         </tbody>
       </table>
@@ -211,57 +335,57 @@ img { max-width: 100%; }
     <p style="margin: 0 0 40px; max-width: 44em; font-size: 17.5px; line-height: 1.7; color: #5c6666">My usual week during the school year. Ask anyway if you need something outside these hours — sometimes it works.</p>
     <div style="background: #fbf8f4; border: 1px solid #ded2ea; border-radius: 3px; padding: clamp(24px, 3.5vw, 40px)">
       <div style="display: grid; gap: 4px">
-        <div style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding-bottom: 10px">
+        <div class="axis-row" style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding-bottom: 10px">
           <span></span>
-          <div style="display: flex; justify-content: space-between; font-size: 11.5px; letter-spacing: 0.12em; color: #736b87">
+          <div class="axis-ticks" style="display: flex; justify-content: space-between; font-size: 11.5px; letter-spacing: 0.12em; color: #736b87">
             <span>9 AM</span><span>12 PM</span><span>3 PM</span><span>6 PM</span><span>9 PM</span>
           </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
-          <span style="font-size: 16px; color: #1f4d4a; font-weight: 500">Saturday</span>
-          <div style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
-            <div style="position: absolute; top: 0; bottom: 0; left: 41.67%; width: 58.33%; background: #2c6e6a; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #eef6f5; font-size: 13px; letter-spacing: 0.03em">2:00 – 9:00 PM</div>
+        <div class="day-row" style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
+          <span class="day-name" data-time="2:00 – 9:00 PM" style="font-size: 16px; color: #1f4d4a; font-weight: 500">Saturday</span>
+          <div class="bar" style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
+            <div class="bar-fill" style="position: absolute; top: 0; bottom: 0; left: 41.67%; width: 58.33%; background: #2c6e6a; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #eef6f5; font-size: 13px; letter-spacing: 0.03em"><span class="bar-text">2:00 – 9:00 PM</span></div>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
-          <span style="font-size: 16px; color: #1f4d4a; font-weight: 500">Sunday</span>
-          <div style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
-            <div style="position: absolute; top: 0; bottom: 0; left: 25%; width: 66.67%; background: #2c6e6a; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #eef6f5; font-size: 13px; letter-spacing: 0.03em">12:00 – 8:00 PM</div>
+        <div class="day-row" style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
+          <span class="day-name" data-time="12:00 – 8:00 PM" style="font-size: 16px; color: #1f4d4a; font-weight: 500">Sunday</span>
+          <div class="bar" style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
+            <div class="bar-fill" style="position: absolute; top: 0; bottom: 0; left: 25%; width: 66.67%; background: #2c6e6a; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #eef6f5; font-size: 13px; letter-spacing: 0.03em"><span class="bar-text">12:00 – 8:00 PM</span></div>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
-          <span style="font-size: 16px; color: #736b87; font-weight: 500">Monday</span>
-          <div style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; font-size: 13px; color: #736b87">Not available</div>
+        <div class="day-row" style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
+          <span class="day-name" data-time="Not available" style="font-size: 16px; color: #736b87; font-weight: 500">Monday</span>
+          <div class="bar bar-empty" style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; font-size: 13px; color: #736b87"><span class="bar-text">Not available</span></div>
         </div>
-        <div style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
-          <span style="font-size: 16px; color: #1f4d4a; font-weight: 500">Tuesday</span>
-          <div style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
-            <div style="position: absolute; top: 0; bottom: 0; left: 58.33%; width: 25%; background: #6b4f96; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #f5f0fb; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap">4 – 7 PM</div>
+        <div class="day-row" style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
+          <span class="day-name" data-time="4 – 7 PM" style="font-size: 16px; color: #1f4d4a; font-weight: 500">Tuesday</span>
+          <div class="bar" style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
+            <div class="bar-fill" style="position: absolute; top: 0; bottom: 0; left: 58.33%; width: 25%; background: #6b4f96; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #f5f0fb; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap"><span class="bar-text">4 – 7 PM</span></div>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
-          <span style="font-size: 16px; color: #1f4d4a; font-weight: 500">Wednesday</span>
-          <div style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
-            <div style="position: absolute; top: 0; bottom: 0; left: 58.33%; width: 25%; background: #6b4f96; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #f5f0fb; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap">4 – 7 PM</div>
+        <div class="day-row" style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
+          <span class="day-name" data-time="4 – 7 PM" style="font-size: 16px; color: #1f4d4a; font-weight: 500">Wednesday</span>
+          <div class="bar" style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
+            <div class="bar-fill" style="position: absolute; top: 0; bottom: 0; left: 58.33%; width: 25%; background: #6b4f96; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #f5f0fb; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap"><span class="bar-text">4 – 7 PM</span></div>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
-          <span style="font-size: 16px; color: #1f4d4a; font-weight: 500">Thursday</span>
-          <div style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
-            <div style="position: absolute; top: 0; bottom: 0; left: 58.33%; width: 25%; background: #6b4f96; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #f5f0fb; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap">4 – 7 PM</div>
+        <div class="day-row" style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
+          <span class="day-name" data-time="4 – 7 PM" style="font-size: 16px; color: #1f4d4a; font-weight: 500">Thursday</span>
+          <div class="bar" style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
+            <div class="bar-fill" style="position: absolute; top: 0; bottom: 0; left: 58.33%; width: 25%; background: #6b4f96; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #f5f0fb; font-size: 13px; letter-spacing: 0.03em; white-space: nowrap"><span class="bar-text">4 – 7 PM</span></div>
           </div>
         </div>
-        <div style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
-          <span style="font-size: 16px; color: #1f4d4a; font-weight: 500">Friday</span>
-          <div style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
-            <div style="position: absolute; top: 0; bottom: 0; left: 41.67%; width: 58.33%; background: #2c6e6a; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #eef6f5; font-size: 13px; letter-spacing: 0.03em">2:00 – 9:00 PM</div>
+        <div class="day-row" style="display: grid; grid-template-columns: 108px 1fr; gap: 20px; align-items: center; padding: 9px 0">
+          <span class="day-name" data-time="2:00 – 9:00 PM" style="font-size: 16px; color: #1f4d4a; font-weight: 500">Friday</span>
+          <div class="bar" style="position: relative; height: 26px; background: #f0eaf7; border-radius: 2px">
+            <div class="bar-fill" style="position: absolute; top: 0; bottom: 0; left: 41.67%; width: 58.33%; background: #2c6e6a; border-radius: 2px; display: flex; align-items: center; padding-left: 12px; color: #eef6f5; font-size: 13px; letter-spacing: 0.03em"><span class="bar-text">2:00 – 9:00 PM</span></div>
           </div>
         </div>
       </div>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; margin-top: 40px">
+    <div class="cols" style="--col: 280px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; margin-top: 40px">
       <div>
         <h3 style="margin: 0 0 12px; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: 22px; color: #1f4d4a">Where I sit</h3>
         <p style="margin: 0 0 14px; font-size: 16.5px; line-height: 1.7; color: #5c6666">Anywhere in Cambridge I can reach on foot, or a short bus or Red Line ride — usually with a parent dropping me off or picking me up.</p>
@@ -277,7 +401,7 @@ img { max-width: 100%; }
   
   <section id="references" style="padding-bottom: 100px">
     <h2 style="margin: 0 0 40px; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: clamp(30px, 3.6vw, 42px); line-height: 1.18; color: #1f4d4a">From families I've sat for</h2>
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px">
+    <div class="cols" style="--col: 260px; display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 28px">
       <blockquote style="margin: 0; background: #fbf8f4; border: 1px dashed #c3b2dc; border-radius: 3px; padding: 32px 30px">
         <p style="margin: 0 0 18px; font-family: 'Cormorant Garamond', Georgia, serif; font-style: italic; font-size: 21px; line-height: 1.55; color: #6f6785">A quote from a family goes here — a sentence or two about how the evening went.</p>
         <footer style="font-size: 14px; letter-spacing: 0.06em; color: #736b87">Name, neighborhood</footer>
@@ -326,7 +450,7 @@ img { max-width: 100%; }
   </section>
 
   <section id="contact" style="background: #1f4d4a; border-radius: 4px; padding: clamp(34px, 5vw, 68px); margin-bottom: 90px">
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 56px; align-items: start">
+    <div class="contact-grid cols" style="--col: 280px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 56px; align-items: start">
       <div>
         <h2 style="margin: 0 0 20px; font-family: Marcellus, Georgia, serif; font-weight: 400; font-size: clamp(30px, 3.6vw, 42px); line-height: 1.16; color: #f6f2e9">Tell me about your needs</h2>
         <p style="margin: 0 0 22px; max-width: 34em; font-size: 17.5px; line-height: 1.7; color: #cfe0dd">Send the date and hours, the ages, and anything I should know. I check messages after school and usually reply the same day. My parents see these too — that's on purpose.</p>
@@ -341,7 +465,7 @@ img { max-width: 100%; }
           <span style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #a8c9c5">Email</span>
           <input type="email" name="email" required="required" style="padding: 13px 14px; background: #f6f2e9; border: 1px solid #4a7d79; border-radius: 2px; color: #1f4d4a; font-size: 16px" />
         </label>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px">
+        <div class="pair" style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px">
           <label style="display: grid; gap: 7px">
             <span style="font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: #a8c9c5">Date</span>
             <input type="date" name="date" style="padding: 13px 14px; background: #f6f2e9; border: 1px solid #4a7d79; border-radius: 2px; color: #1f4d4a; font-size: 16px" />
@@ -378,7 +502,7 @@ img { max-width: 100%; }
     </div>
   </section>
 
-  <footer style="display: flex; flex-wrap: wrap; gap: 14px 40px; justify-content: space-between; align-items: baseline; padding: 0 0 60px; border-top: 1px solid #ded2ea; padding-top: 30px">
+  <footer class="site-footer" style="display: flex; flex-wrap: wrap; gap: 14px 40px; justify-content: space-between; align-items: baseline; padding: 0 0 60px; border-top: 1px solid #ded2ea; padding-top: 30px">
     <span style="font-family: Marcellus, Georgia, serif; font-size: 18px; letter-spacing: 0.06em; color: #1f4d4a">Iona Sits</span>
     <span style="font-size: 14.5px; color: #7d7590">Babysitting &amp; mother's helper · Cambridge, MA</span>
     <span style="font-size: 14.5px; color: #736b87">Red Cross Babysitter's Training · Pediatric First Aid / CPR / AED</span>
