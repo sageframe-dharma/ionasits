@@ -11,8 +11,9 @@ Fonts load from Google Fonts. The contact form posts to Formspree.
 
 ## Deployment
 
-GitHub Pages, served from the `main` branch root.
-`.nojekyll` disables Jekyll processing — the HTML ships as written.
+Cloudflare Pages, project `ionasits`, served at https://ionasits.pages.dev.
+Connected to this repo — every push to `main` deploys. No build command;
+the repository root is the output directory.
 
 ## Development
 
